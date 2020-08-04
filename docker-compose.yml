@@ -1,0 +1,65 @@
+version: "3"
+
+services:
+  namenode:
+    image: doguin/hadoop-namenode:3.1.3
+    container_name: namenode-3.1.3
+    ports:
+      - 9870:9870
+      - 50070:50070
+    volumes:
+      - hadoop_namenode:/hadoop/dfs/name
+    environment:
+      - CLUSTER_NAME=test
+    env_file:
+      - ./hadoop.env
+
+  datanode:
+    image: doguin/hadoop-datanode:3.1.3
+    container_name: datanode-3.1.3
+    volumes:
+      - hadoop_datanode:/hadoop/dfs/data
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870"
+    env_file:
+      - ./hadoop.env
+    ports:
+      - 9864:9864
+      - 50075:50075
+  
+  resourcemanager:
+    image: doguin/hadoop-resourcemanager:3.1.3
+    container_name: resourcemanager-3.1.3
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870 datanode:9864"
+    env_file:
+      - ./hadoop.env
+    ports:
+      - 8088:8088
+
+  nodemanager1:
+    image: doguin/hadoop-nodemanager:3.1.3
+    container_name: nodemanager-3.1.3
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870 datanode:9864 resourcemanager:8088"
+    env_file:
+      - ./hadoop.env
+    ports:
+      - 8042:8042
+  
+  historyserver:
+    image: doguin/hadoop-historyserver:3.1.3
+    container_name: historyserver-3.1.3
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870 datanode:9864 resourcemanager:8088"
+    volumes:
+      - hadoop_historyserver:/hadoop/yarn/timeline
+    env_file:
+      - ./hadoop.env
+    ports:
+      - 8188:8188
+  
+volumes:
+  hadoop_namenode:
+  hadoop_datanode:
+  hadoop_historyserver:
