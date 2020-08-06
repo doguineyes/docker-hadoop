@@ -40,6 +40,8 @@ services:
   nodemanager1:
     image: doguin/hadoop-nodemanager:3.1.3
     container_name: nodemanager-3.1.3
+    volumes:
+      - hadoop_nodemanager:/hadoop/yarn/local
     environment:
       SERVICE_PRECONDITION: "namenode:9870 datanode:9864 resourcemanager:8088"
     env_file:
@@ -63,3 +65,4 @@ volumes:
   hadoop_namenode:
   hadoop_datanode:
   hadoop_historyserver:
+  hadoop_nodemanager:
